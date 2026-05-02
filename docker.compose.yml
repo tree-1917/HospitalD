@@ -1,0 +1,55 @@
+# =================================================== #
+# Project: Hospital System
+# =================================================== #
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: hospital
+      POSTGRES_USER: hospital
+      POSTGRES_PASSWORD: hospital123
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./Models/models.sql:/docker-entrypoint-initdb.d/01-models.sql:ro
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hospital -d hospital"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  opa:
+    image: openpolicyagent/opa:0.60.0
+    ports:
+      - "8181:8181"
+    command: ["run", "--server", "--addr", ":8181", "/policies/hospital.rego"]
+    volumes:
+      - ./Polices:/policies:ro
+  doctor-app:
+    build: ./Doctor/
+    ports:
+      - "5000:5000"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=hospital
+      - POSTGRES_USER=hospital
+      - POSTGRES_PASSWORD=hospital123
+      - OPA_URL=http://opa:8181/v1/data/hospital/auth/allow
+    depends_on:
+      postgres:
+        condition: service_healthy
+  clerk-app:
+    build: ./Clerk
+    ports:
+      - "3000:3000"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=hospital
+      - POSTGRES_USER=hospital
+      - POSTGRES_PASSWORD=hospital123
+      - OPA_URL=http://opa:8181/v1/data/hospital/auth/allow
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  postgres_data:

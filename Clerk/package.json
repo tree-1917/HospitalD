@@ -1,0 +1,19 @@
+{
+  "name": "clerk",
+  "version": "1.0.0",
+  "description": "Clerk Appliction For Money Flow",
+  "main": "index.js",
+  "scripts": {
+    "build": "mkdir -p dist && cp app.js dist/app.js",
+    "start": "node dist/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.15.2",
+    "express": "^5.2.1",
+    "pg": "^8.20.0",
+    "socket.io": "^4.8.3"
+  }
+}

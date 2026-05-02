@@ -1,0 +1,38 @@
+CREATE TYPE user_role AS ENUM ('doctor', 'patient', 'clerk');
+
+CREATE TABLE doctors (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  role user_role NOT NULL DEFAULT 'doctor',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE patients (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  role user_role NOT NULL DEFAULT 'patient',
+  summary JSONB DEFAULT '{}',
+  doctor_id INT REFERENCES doctors (id) ON DELETE SET NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE clerks (
+  id SERIAL PRIMARY KEY,
+  username VARCHAR(255) NOT NULL UNIQUE,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  doctor_id INT REFERENCES doctors (id) ON DELETE SET NULL,
+  role user_role NOT NULL DEFAULT 'clerk',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE recipes (
+  id SERIAL PRIMARY KEY,
+  doctor_id INT NOT NULL REFERENCES doctors (id) ON DELETE CASCADE,
+  patient_id INT NOT NULL REFERENCES patients (id) ON DELETE CASCADE,
+  title VARCHAR(255) NOT NULL,
+  price DECIMAL(10, 2) NOT NULL DEFAULT 0.00,
+  status VARCHAR(50) DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
