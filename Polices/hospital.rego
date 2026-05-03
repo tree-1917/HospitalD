@@ -5,29 +5,32 @@ package hospital.auth
 
 default allow = false
 
-# INFO : Health Check
+# INFO: Health Rule
 allow {
-	input.path = "/healthz"
+	input.path == "/healthz"
 }
 
 # =================================================== #
-# General Rules
+# Rule: Global
 # =================================================== #
-is_day_hour {
-	[hour, _, _] := time.clock(time.now_ns())
-	hour >= 0
-	hour < 12
+
+is_hours_day {
+	[hours, _, _] := time.clock(time.now_ns())
+	hours >= 9 # 9 AM
+
+	# TEST: For Test will Make this 15 which must be 17
+	hours < 15 # 5 PM
 }
 
-is_week_day {
-	weekday := time.weekday(time.now_ns())
-	weekday != "Friday"
+is_work_day {
+	today := time.weekday(time.now_ns())
+	today != "Friday"
 }
 
-# INFO: working Hours = work day && day hours
+# INFO: work_hours = work_day + hour_day
 is_work_hours {
-	is_day_hour
-	is_week_day
+	is_work_day
+	is_hours_day
 }
 
 # =================================================== #
@@ -40,8 +43,8 @@ allow {
 
 allow {
 	input.user.role == "doctor"
-	input.method = {"GET", "POST"}[_]
-	input.path = "/hospital/recipes"
+	input.method == {"GET", "POST"}[_]
+	input.path == "/hospital/recipes"
 }
 
 # =================================================== #
@@ -50,12 +53,12 @@ allow {
 allow {
 	input.user.role == "clerk"
 	startswith(input.path, "/hospital/clerk")
-	#is_work_hours
+	is_work_hours
 }
 
 allow {
-	input.user.role = "clerk"
-	input.method = "PUT"
-	input.path = "/hospital/recipes"
-	#is_work_hours
+	input.user.role == "clerk"
+	input.method == "PUT"
+	input.path == "/hospital/recipes"
+	is_work_hours
 }
