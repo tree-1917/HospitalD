@@ -9,4 +9,4 @@ jobs:
       - name: Pong Action
         uses: tree-1917/hurldm@main
         with:
-          developer-name: "Main Developer"
+          developer-name: "Main Devops"
