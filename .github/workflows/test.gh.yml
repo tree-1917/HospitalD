@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Pong Action
-        uses: tree-1917/ActionD@main
+        uses: tree-1917/hurldm@main
         with:
           who-to-gree: "Github Action"
