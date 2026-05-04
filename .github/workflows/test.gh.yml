@@ -9,4 +9,4 @@ jobs:
       - name: Pong Action
         uses: tree-1917/hurldm@main
         with:
-          who-to-gree: "Github Action"
+          developer-name: "Github Action"
